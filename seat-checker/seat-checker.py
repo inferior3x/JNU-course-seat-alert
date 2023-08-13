@@ -32,7 +32,6 @@ async def main():
     await page.goto(URL)
 
     child_process_started = False
-    process = None
     #조회 반복
     while True:
         #입력한 강의들로 번갈아가며 작업 수행
@@ -73,14 +72,14 @@ async def main():
                     
                     #여석 수 가져오기
                     digits = get_list_of_digit_in_string(lecture[8]) # lecture[8] : 여석 수
-                    if LECTURE_PROP[1] == 1 :
+                    if LECTURE_PROP[2] == 1 :
                         remainder = digits[0]+digits[3] #자과 여석수
                     else:
                         remainder = digits[1]+digits[4] #타과 여석수
                     
                     #여석 수 확인 후 있으면 진행
-                    if remainder == 0:
-                        print(f'{LECTURE_NAME} 여석 발생 {datetime.now().strftime("%H:%M:%S")}')
+                    if remainder != 0:
+                        print(f'{LECTURE_NAME} 여석 생김 {datetime.now().strftime("%H:%M:%S")}')
 
                         #수강 신청 창 띄우고 텔레그램으로 알림 보내기 / 나중에 서버만들고 서버한테 무슨 강의가 여석 발생했는지 넘기기
 
@@ -92,7 +91,7 @@ async def main():
                             child_process_started = True
 
                         #알림
-                        bot.sendMessage(TELEGRAM_USER_ID, f'{LECTURE_NAME} 여석 발생')
+                        bot.sendMessage(TELEGRAM_USER_ID, f'{LECTURE_NAME} 여석 생김')
 
 
 if __name__ == '__main__':
