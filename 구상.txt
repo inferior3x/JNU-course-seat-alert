@@ -1,0 +1,75 @@
+
+테이블 or 문서
+users {
+    id
+    user_id
+    password
+    isAdmin
+    push_notification_id: ''
+    applied_subject: [{
+        subject: ObjectId(subject_to_alert->id), seat_type: 'self'/'other'
+    }, ...]
+}
+
+subject_to_alert {
+    id
+    subject_name: '캡스톤'
+    subject_code: 'CLT0085-1' //분반까지
+    alertedSelf: boolean,
+    alertedOther: boolean,
+    applicant = { [{
+        user: ObjectId(users->id),
+        push_notification_id: '',
+        seat_type: ''
+    },{},...] }
+}
+
+/*application {
+    id
+    subject_id: ObjectId(subject_to_alert - doc id)
+    user_id: ObjectId(users - doc id)
+    push_notification_id
+}*/
+
+[인지사항]
+csrf로 일단 구현해놓고 double csrf로 교체
+자동 로그인 좀이따 구현
+
+[페이지]
+1. 회원가입 - 특수문자X
+2. 로그인
+3. 메인 - 내가 신청한 과목(+ 옆에 삭제 버튼), 모두 삭제, 과목 추가 버튼(과목 이름과 과목의 대상학년, 과목 코드, 자과/타과 입력)
+5. 설정 - 알림 횟수, 비밀번호 변경(세션 삭제!)
+
+[구현]
+-신청 과목 추가(py)
+1. 전남대 수업 목록 사이트에서 전달 받은 수업 정보로 수업을 검색
+2. 수업 존재 ?
+ (
+ 신청 개수 확인(신청 과목 배열 길이)
+  내가 신청한 수업인지 확인
+   내가 신청한 수업 리스트에 추가
+   알림 보낼 수업 리스트에 없을 경우 수업 추가
+   수업의 신청자 목록에 추가
+   추가 완료 alert창) : 과목 없음 alert창;
+
+-신청 과목 삭제
+applicant.user 중에 같은 거 찾아서 삭제, applicant 배열 길이 0일 경우 그 문서 삭제
+user의 신청 과목에서 과목 삭제
+
+
+-초기화
+applicant.user 중에 같은 거 찾아서 삭제, applicant 배열 길이 0일 경우 그 문서 삭제 - 모든 과목에 대해
+user 신청 과목 전체 삭제
+
+
+-알림(py)
+1. subject_to_alert의 모든 document를 가져옴
+2. 스레드에게 (과목 수 / 스레드 수) 만큼의 과목을 전달해줌
+3. 스레드는 웹페이지에게 (자신이 맡은 과목 수 / 웹페이지 수)만큼의 과목을 전달해줌 - 인덱싱
+4. 여석이 있는지 확인함
+5-1. 여석 없을 경우 : 
+alerted ? (과목 사라짐 푸시 알림, alerted: false) : return ;
+5-2. 여석 있을 경우 : 
+alerted ? (return) : (과목 생김 푸시 알림) ;
+푸시 알람 id를 얻기 위해 users 문서를 참조하지 않게 하기 위해(비효율적) 신청자 문서에도 푸시 알람 id 넣기 - 대신 푸시 알림 id가 변경됐을 경우 최신화 잘해야 함

@@ -1,0 +1,21 @@
+<%- include('includes/head.ejs') %>
+  </head>
+  <body>
+    <% if ( inputData.error ) { %>
+      <p> <%= inputData.message %> </p>
+    <% } %>
+    <form action="/login" method="POST">
+      <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+      <div>
+        <label for="user-id">ID</label>
+        <input type="text" name="user-id" id="user-id" value='<%= inputData.id %>' pattern="[a-zA-Z0-9]+"  required/>
+      </div>
+      <div>
+        <label for="user-pw">PW</label>
+        <input type="password" name="user-pw" id="user-pw" value='<%= inputData.password %>' required/>
+      </div>
+      <button>로그인</button>
+    </form>
+    <button><a href="/signup">회원가입</a></button>
+  </body>
+</html>

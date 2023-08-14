@@ -1,0 +1,34 @@
+<%- include('includes/head.ejs') %>
+    <script src="/js/signup.js" defer></script>
+  </head>
+  <body>
+    <% if ( inputData.error ) { %>
+      <p> <%= inputData.message %> </p>
+    <% } %>
+    <form action="/signup" method="POST">
+      <input type="hidden" name="_csrf" value="<%= locals.csrfToken %>">
+      <div>
+        <label for="user-id">ID</label>
+        <input
+          type="text"
+          name="user-id"
+          id="user-id"
+          value='<%= inputData.id %>'
+          pattern="[a-zA-Z0-9]+"
+          required
+        />
+        <p>영문자와 숫자만 가능</p>
+      </div>
+      <div>
+        <label for="user-pw">Set password</label>
+        <input type="password" name="user-pw" id="user-pw" value='<%= inputData.password %>' required />
+      </div>
+      <div>
+        <label for="user-pw2">Password check</label>
+        <input type="password" name="user-pw2" id="user-pw2" value='<%= inputData.password2 %>' required />
+      </div>
+      <button>회원가입</button>
+    </form>
+    <button><a href="/login">로그인</a></button>
+  </body>
+</html>
