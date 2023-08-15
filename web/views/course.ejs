@@ -1,0 +1,53 @@
+<%- include('includes/head.ejs') %>
+    <script src="/js/course.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <p id="error-message"></p>
+      <form action="/add-course" method="POST">
+        <input type="hidden" name="_csrf" id="_csrf" value="<%= locals.csrfToken %>">
+          <div>
+            <label for="name">과목 이름</label>
+            <input type="text"name="name" id="name" value='' required/> <!--%= inputData.name %-->
+          </div>
+          <div>
+            <label for="code">과목코드-분반</label>
+            <input type="text" placeholder="ECE0000-1" name="code" id="code" value='' required /> <!--%= inputData.code %-->
+          </div>
+          <div>
+            <label for="grade">대상 학년</label>
+            <select id="grade" name="grade" required>
+              <option value="-1">선택</option>
+              <option value="1">1학년</option>
+              <option value="2">2학년</option>
+              <option value="3">3학년</option>
+              <option value="4">4학년</option>
+            </select>
+          </div>
+          <div>
+            <label for="type">구분</label>
+            <select id="type" name="type" required>
+              <option value="-1">선택</option>
+              <option value="1">자과</option>
+              <option value="0">타과</option>
+            </select>
+            <button id="add-course-btn">과목 추가</button>
+          </div>
+        </form>
+    </header>
+    <main>
+      <section>
+        <% if (!courses) { %>
+          <p> 알림 받을 과목이 없습니다</p>
+        <% } else { %>
+          <ul>
+            <% for (course of courses) {%>
+              <li> <%= course.name %> <%= course.code %> <%= course.alertSelf %> <%= course.alertOther %> </li>
+            <% } %>
+          </ul>
+        <% } %>
+      </section>
+    </main>
+    <footer></footer>
+  </body>
+</html>

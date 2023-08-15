@@ -8,12 +8,21 @@ const sessionConfig = require('./config/session-config');
 const db = require('./database/database');
 
 const csrf = require('csurf');
+
 const csrfMiddleware = require('./middlewares/csrf-middleware');
+const localsMiddleware = require('./middlewares/locals-middleware');
 
 const authRouter = require("./routes/auth");
-const subjectRouter = require("./routes/subject");
+const courseRouter = require("./routes/course");
 
-//
+const PythonSpawn = require('./util/python-spawn');
+
+//run course-searcher.py
+const courseSearcher = new PythonSpawn('course-searcher.py');
+courseSearcher.spawnPython();
+module.exports.courseSearcher = courseSearcher;
+
+//server
 const app = express();
 
 //mongodb session
@@ -26,11 +35,16 @@ app.set("view engine", "ejs");
 
 //static files
 app.use(express.static("public"));
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true })); //false랑 뭐가 다른지 보기
+//decode request encoded to json
+app.use(express.json());
 
 //csrf
 app.use(csrf());
 app.use(csrfMiddleware.setLocalCsrfToken);
+
+//session to locals
+app.use(localsMiddleware.setSession);
 
 //400
 app.get('/401', (req, res) => res.status(401).render('401'));
@@ -38,7 +52,7 @@ app.get('/404', (req, res) => res.status(404).render('404'));
 
 //routers
 app.use(authRouter);
-app.use(subjectRouter);
+app.use(courseRouter);
 
 //500
 // app.use(function (error, req, res, next) {

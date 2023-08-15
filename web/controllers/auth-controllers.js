@@ -1,6 +1,6 @@
-const validation = require('../util/validation');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const validation = require('../util/validation');
 const validationSession = require('../util/validation-session');
 
 function gotoSignup(req, res) {
@@ -8,6 +8,9 @@ function gotoSignup(req, res) {
 }
 
 function getSignup(req, res) {
+    if (res.locals.isAuthenticated)
+        return res.redirect('/course');
+
     let inputData = validationSession.getErrorInputData(req);
     if (!inputData)
       inputData = validationSession.getEmptyInputData(
@@ -21,6 +24,9 @@ function getSignup(req, res) {
 }
 
 function getLogin(req, res) {
+    if (res.locals.isAuthenticated)
+    return res.redirect('/course');
+
     let inputData = validationSession.getErrorInputData(req);
     if (!inputData)
       inputData = validationSession.getEmptyInputData(
@@ -80,7 +86,7 @@ async function login(req, res) {
     const enteredPassword = req.body['user-pw'];
   
     const user = new User(enteredId);
-    await user.fecth();
+    await user.find();
   
     //유저 존재하지 않을 때
     if (!user._id) {
@@ -110,11 +116,11 @@ async function login(req, res) {
     }
   
     //로그인, 세션 쿠키 추가
-    req.session['user-info'] = {
+    req.session['user'] = {
       id: enteredId,
     }
     req.session.isAuthenticated = true;
-    req.session.save(() => res.redirect('/subject'));
+    req.session.save(() => res.redirect('/course'));
 }
 
 

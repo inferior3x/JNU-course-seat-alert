@@ -12,7 +12,7 @@ router.post("/signup", authControllers.signup);
 
 router.post('/login', authControllers.login);
 
-//로그아웃 추가 - user-info null isAthenticated null (세션 삭제)
+//로그아웃 추가 - user-info null isAuthenticated null (세션 삭제)
 
 
 module.exports = router;

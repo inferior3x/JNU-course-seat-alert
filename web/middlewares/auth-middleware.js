@@ -1,6 +1,5 @@
-
 function checkAuthentication(req, res, next){
-    if (!req.session.isAuthenticated){
+    if (!res.locals.isAuthenticated){
         return res.redirect('/401');
     }
     return next();

@@ -40,6 +40,7 @@ async def set_dropdown_by_index(page, attribute, index):
 
 #async function - 테이블의 데이터 가져오기
 async def get_tabledata(page, attribute, totalnum = 0):
+    await page.waitFor(500)
     await page.waitForFunction(f'''document.querySelectorAll("{attribute} tr").length >= {str(totalnum)}''')
     try:
         return await page.evaluate(f'''
@@ -60,7 +61,7 @@ async def get_tabledata(page, attribute, totalnum = 0):
         return -1
 
 #async function - 전체 강의 수 불러오기
-async def get_total_lecture_number(page, attribute):
+async def get_total_course_number(page, attribute):
     await page.waitForSelector(attribute)
     try:
         return str(await page.evaluate('document.querySelector("'+attribute+'").textContent'))

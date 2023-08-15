@@ -4,7 +4,7 @@ function createMongodbSessionStore(session) {
     const MongoDBStore = mongodbStore(session);
     const sessionStore = new MongoDBStore({
       uri: "mongodb://localhost:27017",
-      databaseName: "auth-demo",
+      databaseName: "auto-course-seat-alert-session",
       collection: "sessions",
     });
     return sessionStore

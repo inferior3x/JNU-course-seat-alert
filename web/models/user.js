@@ -19,11 +19,11 @@ class User {
         await db.getDb().collection('users').deleteOne({id: this.id});
     }
 
-    async modify(projection) {
-        await db.getDb().collection('users').updateOne({id: this.id}, {projection: projection});
+    async modify(field) {
+        await db.getDb().collection('users').updateOne({id: this.id}, field);
     }
 
-    async fecth(projection) {
+    async find(projection) {
         const user = await db.getDb().collection('users').findOne({id: this.id}, {projection: projection});
         //console.log(`${JSON.stringify(user)}`);
         if (user){
