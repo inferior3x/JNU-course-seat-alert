@@ -41,7 +41,7 @@ async def main(browser):
     
 
     course_name = 'ㅁㄴㅇㄹ'
-    course_code = 'ECE3087-1'
+    course_code = 'ECE3087-5'
     course_grade = '1'
 
 
@@ -62,10 +62,11 @@ async def main(browser):
     courses = await get_tabledata(page[0], COURSE_TABLE_ATT)
     if len(courses) == 1:
         print('없음')
-        
+        await page[0].waitFor(5000000)
     
     if courses == -1:
         print('실패')
+        await page[0].waitFor(5000000)
 
     #강의 중 내가 원하는 과목인지 확인하기 위해 반복
     for course in courses :

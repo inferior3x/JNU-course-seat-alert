@@ -24,7 +24,7 @@ from modules.function import (
 
 #브라우저 생성
 async def create_browser():
-    browser = await launch(headless=False, executablePath='C:\Program Files\Google\Chrome\Application\chrome.exe')
+    browser = await launch(headless=True, executablePath='C:\Program Files\Google\Chrome\Application\chrome.exe')
     return browser
 
 #새 페이지 생성
@@ -74,10 +74,12 @@ async def main(browser):
                 print(json.dumps({'errorType': 2}))
                 sys.stdout.flush()
                 continue
+
             if courses == -1:
                 print(json.dumps({'errorType': 3}))
                 sys.stdout.flush()
                 continue
+
             #강의 중 내가 원하는 과목인지 확인하기 위해 반복
             for course in courses :
                 #빈 행 넘김

@@ -7,12 +7,19 @@ const {courseSearchingErrMsg} = require('../util/messages');
 
 async function getCourse(req, res) {
     const user = new User(res.locals.user.id);
-    await user.find({courses: 1})
-    console.log(JSON.stringify(user));
+    await user.find({_id: 1})
+    
+    const courses = await Course.findCoursesByApplicant(user._id);
+    //console.dir(courses);
+    res.render("course", {courses: courses});
+}
 
-    // if (!user.courses)
-    //     console.log(1);
-    res.render("course", {courses: user.courses});
+async function fetchCourse(req, res) {
+    const user = new User(res.locals.user.id);
+    await user.find({_id: 1})
+    
+    const courses = await Course.findCoursesByApplicant(user._id);
+    res.json({courses: courses});
 }
 
 async function addCourse(req, res){
@@ -42,7 +49,7 @@ async function addCourse(req, res){
         console.log(`강의 있어서 그대로 진행`);
     }
     
-    //사용자 아이디 불러오기
+    //사용자 _id 불러오기
     const user = new User(res.locals.user.id);
     await user.find({_id: 1});
 
@@ -52,12 +59,22 @@ async function addCourse(req, res){
     }
     
     //과목에 신청자 추가하기
-    await course.modify({$push: {applicant: {
+    await course.modify({$push: {applicants: {
         user: new ObjectId(user._id),
         type: type,
         pushToken: '',
     }}});
-    return res.json({error: false}); //추가됐다는 메세지와 과목 정보 전달하기
+    return res.json({error: false});
 }
 
-module.exports = {getCourse:getCourse, addCourse:addCourse};
+async function deleteCourse(req, res) {
+    const course = new Course(req.body.code);
+    const user = new User(res.locals.user.id);
+    console.log(req.body.code);
+    console.log(res.locals.user.id)
+    await user.find({_id: 1});
+    await course.deleteApplicant(user._id);
+    return res.json({error: false});
+}
+
+module.exports = {getCourse:getCourse, addCourse:addCourse, deleteCourse: deleteCourse, fetchCourse:fetchCourse};

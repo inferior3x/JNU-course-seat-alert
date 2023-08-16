@@ -3,8 +3,8 @@
   </head>
   <body>
     <header>
-      <p id="error-message"></p>
-      <form action="/add-course" method="POST">
+      <p id="message"></p>
+      <form>
         <input type="hidden" name="_csrf" id="_csrf" value="<%= locals.csrfToken %>">
           <div>
             <label for="name">과목 이름</label>
@@ -28,25 +28,15 @@
             <label for="type">구분</label>
             <select id="type" name="type" required>
               <option value="-1">선택</option>
-              <option value="1">자과</option>
-              <option value="0">타과</option>
+              <option value="0">자과</option>
+              <option value="1">타과</option>
             </select>
             <button id="add-course-btn">과목 추가</button>
           </div>
         </form>
     </header>
     <main>
-      <section>
-        <% if (!courses) { %>
-          <p> 알림 받을 과목이 없습니다</p>
-        <% } else { %>
-          <ul>
-            <% for (course of courses) {%>
-              <li> <%= course.name %> <%= course.code %> <%= course.alertSelf %> <%= course.alertOther %> </li>
-            <% } %>
-          </ul>
-        <% } %>
-      </section>
+      <section id="course-section"></section>
     </main>
     <footer></footer>
   </body>

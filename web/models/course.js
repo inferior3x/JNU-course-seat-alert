@@ -11,9 +11,9 @@ class Course {
         await db.getDb().collection('courses').insertOne({
             code: this.code,
             name: this.name,
-            alertSelf: false,
-            alertOther: false,
-            applicant: []
+            alertedSelf: false,
+            alertedOther: false,
+            applicants: []
         });
     }
 
@@ -24,7 +24,7 @@ class Course {
     }
 
     async isExistingApplicant(user_id) {
-        const user = await db.getDb().collection('courses').findOne({code: this.code, 'applicant.user': new ObjectId(user_id)});
+        const user = await db.getDb().collection('courses').findOne({code: this.code, 'applicants.user': new ObjectId(user_id)});
         return user ? true : false ;
     }
 
@@ -35,7 +35,24 @@ class Course {
     async delete() {
 
     }
+    
+    async deleteApplicant(user_id) {
+        return await db.getDb().collection('courses').updateOne({code: this.code}, {$pull: {applicants: {user: new ObjectId(user_id)}}});
+    }
 
+    static async findCoursesByApplicant(user_id) {
+        const courses = await db.getDb().collection('courses').find({'applicants.user': new ObjectId(user_id)}, {projection: {_id: 0, code: 1, name: 1, alertedSelf: 1, alertedOther: 1, 'applicants.$': 1}}).toArray();
+        if (courses) {
+            for (const course of courses){
+                course.type = course.applicants[0].type;
+                course.alerted = (course.type === '1' ? course.alertedOther : course.alertedSelf); //1 타과 0 자과
+                delete course.alertedSelf;
+                delete course.alertedOther;
+                delete course.applicants;
+            }
+        }
+        return courses;
+    }
 }
 
 module.exports = Course;
