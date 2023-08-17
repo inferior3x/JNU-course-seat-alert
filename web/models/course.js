@@ -8,19 +8,30 @@ class Course {
     }
 
     async create() {
-        await db.getDb().collection('courses').insertOne({
-            code: this.code,
-            name: this.name,
-            alertedSelf: false,
-            alertedOther: false,
-            applicants: []
-        });
+        try{
+            await db.getDb().collection('courses').insertOne({
+                code: this.code,
+                name: this.name,
+                grade: this.grade,
+                alertedSelf: false,
+                alertedOther: false,
+                applicants: []
+            });
+        }catch(error){
+            console.log(`could not insert this course : ${this.code}
+            ${error.message}`);
+        }
     }
 
     async find(projection) {
         const course = await db.getDb().collection('courses').findOne({code: this.code}, {projection: projection});
         if (course)
             Object.assign(this, course);
+    }
+
+    async isExistingCourse() {
+        const course = await db.getDb().collection('courses').findOne({code: this.code});
+        return course ? true : false ;
     }
 
     async isExistingApplicant(user_id) {
@@ -33,11 +44,11 @@ class Course {
     }
 
     async delete() {
-
+        
     }
     
     async deleteApplicant(user_id) {
-        return await db.getDb().collection('courses').updateOne({code: this.code}, {$pull: {applicants: {user: new ObjectId(user_id)}}});
+        return await db.getDb().collection('courses').updateMany({code: this.code}, {$pull: {applicants: {user: new ObjectId(user_id)}}});
     }
 
     static async findCoursesByApplicant(user_id) {

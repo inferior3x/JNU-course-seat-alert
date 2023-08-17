@@ -4,9 +4,6 @@ from pyppeteer import launch
 import subprocess
 import os
 
-#텔레그램 설정값 불러오기
-from modules.config_personal import TELEGRAM_USER_ID, bot
-
 #설정값 불러오기
 from modules.config_seat_checker import *
 
@@ -81,17 +78,10 @@ async def main():
                     if remainder != 0:
                         print(f'{COURSE_NAME} 여석 생김 {datetime.now().strftime("%H:%M:%S")}')
 
-                        #수강 신청 창 띄우고 텔레그램으로 알림 보내기 / 나중에 서버만들고 서버한테 무슨 강의가 여석 발생했는지 넘기기
+                        #서버한테 무슨 강의가 여석 발생했는지 넘기기
 
-                        #수강 신청 창 띄우기
-                        if not child_process_started:
-                            script_path = os.path.dirname(__file__)+r'\registration.py'
-                            arguments = [COURSE_NAME, COURSE_PROP[0]]
-                            process = subprocess.Popen(['python', script_path] + arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-                            child_process_started = True
+                
 
-                        #알림
-                        bot.sendMessage(TELEGRAM_USER_ID, f'{COURSE_NAME} 여석 생김')
 
 
 if __name__ == '__main__':

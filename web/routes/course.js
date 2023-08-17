@@ -11,6 +11,6 @@ router.get("/fetch-course", courseControllers.fetchCourse);
 
 router.post("/add-course", courseControllers.addCourse);
 
-router.post("/delete-course", courseControllers.deleteCourse);
+router.post("/delete-course", courseControllers.deleteApplicantFromCourse);
 
 module.exports = router;

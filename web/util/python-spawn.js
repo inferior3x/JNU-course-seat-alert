@@ -24,10 +24,8 @@ class PythonSpawn {
     async receiveData(){ //string
         return new Promise((resolve) =>{
                 const waitForMyData = (data) => {
-                    //if (data.includes(checkValue)){
                         this.pythonProcess.stdout.off('data', waitForMyData);
                         resolve(JSON.parse(data));
-                    //}
                 }
                 this.pythonProcess.stdout.on('data', waitForMyData);
             }

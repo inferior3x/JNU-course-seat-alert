@@ -8,11 +8,17 @@ class User {
     }
 
     async create() {
-        await db.getDb().collection('users').insertOne({
-            id: this.id, 
-            password: this.password, 
-            isAdmin: false,
-        });
+        try{
+            await db.getDb().collection('users').insertOne({
+                id: this.id, 
+                password: this.password, 
+                isAdmin: false,
+            });
+        }catch(error){
+            console.log(`could not insert this user : ${this.id}
+            ${error.message}`);
+        }
+
     }
 
     async delete() {
@@ -25,7 +31,6 @@ class User {
 
     async find(projection) {
         const user = await db.getDb().collection('users').findOne({id: this.id}, {projection: projection});
-        //console.log(`${JSON.stringify(user)}`);
         if (user){
             Object.assign(this, user);
         }

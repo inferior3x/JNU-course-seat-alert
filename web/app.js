@@ -17,10 +17,14 @@ const courseRouter = require("./routes/course");
 
 const PythonSpawn = require('./util/python-spawn');
 
-//run course-searcher.py
+// run course-searcher.py
 const courseSearcher = new PythonSpawn('course-searcher.py');
 courseSearcher.spawnPython();
+// run seat-checker.py
+const seatChecker = new PythonSpawn('seat-checker.py');
+//seatChecker.spawnPython();
 module.exports.courseSearcher = courseSearcher;
+module.exports.seatChecker = seatChecker;
 
 //server
 const app = express();

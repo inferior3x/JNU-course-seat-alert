@@ -9,6 +9,8 @@ async function connectToDatabase() {
     'mongodb://localhost:27017'
   );
   database = client.db('auto-course-seat-alert');
+  database.collection('users').createIndex({ id: 1 }, { unique: true });
+  database.collection('courses').createIndex({ code: 1 }, { unique: true });
 }
 
 function getDb() {

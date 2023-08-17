@@ -39,10 +39,10 @@ async def set_dropdown_by_index(page, attribute, index):
         ''')
 
 #async function - 테이블의 데이터 가져오기
-async def get_tabledata(page, attribute, totalnum = 0):
-    await page.waitFor(500)
-    await page.waitForFunction(f'''document.querySelectorAll("{attribute} tr").length >= {str(totalnum)}''')
+async def get_tabledata(page, attribute, totalnum = 1):
     try:
+        await page.waitForNavigation()
+        await page.waitForFunction(f'''document.querySelectorAll("{attribute} tr").length >= {str(totalnum)}''')
         return await page.evaluate(f'''
                             const table = document.querySelector("{attribute}");
                             const rows = table.querySelectorAll('tr');

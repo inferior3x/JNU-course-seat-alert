@@ -8,6 +8,9 @@ COURSES_TO_FIND = {
 # URL
 URL = 'https://hakstd.jnu.ac.kr/web/Suup/TimeTable/Suup053C.aspx'
 
+#chrome exe path
+CHROME_PATH = 'C:\Program Files\Google\Chrome\Application\chrome.exe'
+
 # dropdown
 GRADE_DD_ATT = '#ContentPlaceHolder_ContentPlaceHolderSub_ddlGrade'
 
