@@ -1,43 +1,28 @@
 import nest_asyncio
 import asyncio
-from pyppeteer import launch
-
 import sys
 import json
-
-
-#설정값 불러오기
-from modules.config_seat_checker import (URL, GRADE_DD_ATT, COURSE_NAME_INPUT_ATT, COURSE_TABLE_ATT, SEARCH_BTN_ATT, CHROME_PATH)
-
-#함수 불러오기
-from modules.function import (
+from modules.config.crawler_config import (
+    URL, 
+    GRADE_DD_ATT, 
+    COURSE_NAME_INPUT_ATT, 
+    COURSE_TABLE_ATT, 
+    SEARCH_BTN_ATT, 
+    CHROME_PATH)
+from modules.function.util_function import delete_whitespace
+from modules.function.crawling_function import (
+    create_browser,
+    create_new_pages,
     clickElementWithWait,
     typeToElementWithWait,
     set_dropdown_by_index,
     get_tabledata,
-    delete_whitespace
 )
 
 
-#브라우저 생성
-async def create_browser():
-    browser = await launch(headless=False, executablePath=CHROME_PATH)
-    return browser
-
-#새 페이지 생성
-async def create_new_page(browser):
-    page = await browser.newPage()
-    await page.goto(URL)
-    return page
-
-#메인
-async def main(browser):
-    page = []
-    page_status = [] # 0 unoccupied / 1 occupied
-
-    # for i in range(5):
-    page.append(await create_new_page(browser))
-    page_status.append(0)
+async def main():
+    browser = await create_browser(False)
+    pages = await create_new_pages(browser, URL, 1)
     
     for json_data in sys.stdin:
         try:
@@ -55,16 +40,16 @@ async def main(browser):
             found = 0
 
             #드랍다운 선택
-            await set_dropdown_by_index(page[0], GRADE_DD_ATT, course_grade)
+            await set_dropdown_by_index(pages[0], GRADE_DD_ATT, course_grade)
             
             #여석 가져올 교과목명 입력
-            await typeToElementWithWait(page[0], COURSE_NAME_INPUT_ATT, course_name)#course_name
+            await typeToElementWithWait(pages[0], COURSE_NAME_INPUT_ATT, course_name)#course_name
             
             #조회 버튼 클릭
-            await clickElementWithWait(page[0], SEARCH_BTN_ATT)
+            await clickElementWithWait(pages[0], SEARCH_BTN_ATT)
             
             #테이블 데이터 가져오기
-            courses = await get_tabledata(page[0], COURSE_TABLE_ATT)
+            courses = await get_tabledata(pages[0], COURSE_TABLE_ATT)
             if len(courses) == 1:
                 print(json.dumps({'errorType': 2}))
                 sys.stdout.flush()
@@ -97,9 +82,7 @@ async def main(browser):
 
 
 nest_asyncio.apply()
-
-browser = asyncio.run(create_browser())
-asyncio.run(main(browser))
+asyncio.run(main())
 
 
 

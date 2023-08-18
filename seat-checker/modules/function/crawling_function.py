@@ -1,6 +1,32 @@
-import re
+from pyppeteer import launch
+import asyncio
+from modules.config.crawler_config import (
+    CHROME_PATH,
+)
 
-#function - 버튼 보일 때까지 스크롤
+#브라우저 생성 - return browser
+async def create_browser(headless=True):
+    browser = await launch(headless=headless, executablePath=CHROME_PATH)
+    return browser
+
+#새 페이지 생성 - return pages
+async def create_new_pages(browser, url, number):
+    for _ in range(number - 1): #브라우저 열면서 페이지 1개는 기본 생성되므로 -1
+        await browser.newPage()
+    pages = await browser.pages()
+    for i in range(number):
+        await pages[i].goto(url)
+    return pages
+
+#브라우저 닫기
+async def close_browser(browser):
+    try:
+        await browser.close()
+        await asyncio.sleep(1)
+    except Exception as error:
+        print(f'error! : {error}')
+
+#async function - 버튼 보일 때까지 스크롤
 async def scroll_element_into_viewport(page, attribute):
     await page.waitForSelector(attribute, visible= True)
     await page.evaluate(f'''document.querySelector("{attribute}").scrollIntoView();''')
@@ -71,12 +97,3 @@ async def get_total_course_number(page, attribute):
 #async function - 요소 찾고 반환
 async def find_element(page, attribute):
     return await page.querySelector(attribute)
-
-#function - 문자열에서 숫자들 골라서 리스트에 넣기
-def get_list_of_digit_in_string(string):
-    numbers = re.findall(r'\d+', string) # r : 이스케이프를 특문으로 인식, \d : digit, + : 앞의 패턴이 여러 번 나타날 것을 고려, findall() : 찾은 모든 것을 리스트로 반환
-    return list(map(int, numbers))
-
-#function - 문자열에 들어간 공백, 개행, 탭 없애기
-def delete_whitespace(string):
-    return re.sub(r'\s+', '', string) # \s : whitespace, sub() : 찾은걸 두 번째 인자로 대체하고 반환

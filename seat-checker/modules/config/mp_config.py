@@ -1,0 +1,3 @@
+PAGE_NUMBER = 3 #parent, child
+PROCESS_NUMBER = 3 #p
+COUNT_TO_CLOSE_PROC = 3 #p
