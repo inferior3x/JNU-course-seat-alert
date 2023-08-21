@@ -48,18 +48,6 @@ else:
 
 for r in ranges:
     print(f"Range: {r[0]} - {r[1]}")
-# 0 ~ 1004
-
-# print(applied_courses_num // 7)
-# term = applied_courses_num // 7
-# for i in range(7):
-    
-#     print(f'{i * term} ~ {(applied_courses_num - 1) if (i==6) else ((i+1) * term - 1)}')
-# print(time.time() - start_time) ###
-
-# min + i * (range + 1);
-# 		(i == THREADS_NUM - 1) ? (threads_args[i][1] = max) : (threads_args[i][1] = min + (i + 1) * (range) + i);
-
 
 
 # print(applied_courses)

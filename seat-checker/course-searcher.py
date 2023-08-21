@@ -50,12 +50,12 @@ async def main():
             
             #테이블 데이터 가져오기
             courses = await get_tabledata(pages[0], COURSE_TABLE_ATT)
-            if len(courses) == 1:
-                print(json.dumps({'errorType': 2}))
-                sys.stdout.flush()
-                continue
             if courses == -1:
                 print(json.dumps({'errorType': 3}))
+                sys.stdout.flush()
+                continue
+            if len(courses) == 1:
+                print(json.dumps({'errorType': 2}))
                 sys.stdout.flush()
                 continue
 
