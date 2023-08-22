@@ -1,12 +1,15 @@
 from pyppeteer import launch
 import asyncio
+import os
+from modules.function.mp_function import push_and_flush_stdout
 from modules.config.crawler_config import (
     CHROME_PATH,
 )
 
 #브라우저 생성 - return browser
 async def create_browser(headless=True):
-    browser = await launch(headless=headless, executablePath=CHROME_PATH)
+    current_os = os.name
+    browser = await launch(headless=headless, executablePath=(CHROME_PATH if current_os == "nt" else None))
     return browser
 
 #새 페이지 생성 - return pages
@@ -24,7 +27,7 @@ async def close_browser(browser):
         await browser.close()
         await asyncio.sleep(1)
     except Exception as error:
-        print(f'error! : {error}')
+        push_and_flush_stdout('log', f'close browser - error : {error}')
 
 #async function - 버튼 보일 때까지 스크롤
 async def scroll_element_into_viewport(page, attribute):

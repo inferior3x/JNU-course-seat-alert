@@ -7,8 +7,7 @@ from modules.config.crawler_config import (
     GRADE_DD_ATT, 
     COURSE_NAME_INPUT_ATT, 
     COURSE_TABLE_ATT, 
-    SEARCH_BTN_ATT, 
-    CHROME_PATH)
+    SEARCH_BTN_ATT,)
 from modules.function.util_function import delete_whitespace
 from modules.function.crawling_function import (
     create_browser,

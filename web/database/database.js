@@ -6,7 +6,7 @@ let database;
 
 async function connectToDatabase() {
   const client = await MongoClient.connect(
-    'mongodb://localhost:27017'
+    'mongodb://127.0.0.1:27017/'
   );
   database = client.db('auto-course-seat-alert');
   database.collection('users').createIndex({ id: 1 }, { unique: true });
