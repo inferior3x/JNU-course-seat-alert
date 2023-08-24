@@ -20,7 +20,7 @@ from modules.function.crawling_function import (
 
 
 async def main():
-    browser = await create_browser(False)
+    browser = await create_browser(True)
     pages = await create_new_pages(browser, URL, 1)
     
     for json_data in sys.stdin:

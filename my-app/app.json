@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "my-app",
+    "name": "전남대학교 여석 알리미",
     "slug": "my-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -22,7 +22,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.coco3x.JNU_course_seat"
+      "package": "com.coco3x.jnuseatalert"
     },
     "web": {
       "favicon": "./assets/favicon.png"

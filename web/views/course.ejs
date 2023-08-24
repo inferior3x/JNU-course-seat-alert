@@ -1,39 +1,42 @@
 <%- include('includes/head.ejs') %>
+    <link rel="stylesheet" href="css/course.css"></link>
     <script src="/js/course.js" defer></script>
   </head>
   <body>
+    <div class="layerPopup">
+      <div class="spinner"></div>
+    </div>
     <header>
-      <p id="message"></p>
       <form>
-        <input type="hidden" name="_csrf" id="_csrf" value="<%= locals.csrfToken %>">
-          <div>
-            <label for="name">과목 이름</label>
-            <input type="text"name="name" id="name" value='' required/> <!--%= inputData.name %-->
-          </div>
-          <div>
-            <label for="code">과목코드-분반</label>
-            <input type="text" placeholder="ECE0000-1" name="code" id="code" value='' required /> <!--%= inputData.code %-->
-          </div>
-          <div>
-            <label for="grade">대상 학년</label>
-            <select id="grade" name="grade" required>
-              <option value="-1">선택</option>
-              <option value="1">1학년</option>
-              <option value="2">2학년</option>
-              <option value="3">3학년</option>
-              <option value="4">4학년</option>
-            </select>
-          </div>
-          <div>
-            <label for="type">구분</label>
-            <select id="type" name="type" required>
-              <option value="-1">선택</option>
-              <option value="0">자과</option>
-              <option value="1">타과</option>
-            </select>
-            <button type="button" id="add-course-btn">과목 추가</button>
-          </div>
-        </form>
+        <input type="hidden" name="_csrf" id="_csrf" value="<%=locals.csrfToken%>">
+        <div id="name-field">
+          <label for="name">과목 이름</label>
+          <input type="text"name="name" id="name" value='' required/> <!--%= inputData.name %-->
+        </div>
+        <div id="code-field">
+          <label for="code">과목코드-분반</label>
+          <input type="text" placeholder="ECE0000-1" name="code" id="code" value='' required /> <!--%= inputData.code %-->
+        </div>
+        <div class="dd-field">
+          <label for="grade">대상 학년</label>
+          <select id="grade" name="grade" required>
+            <option value="-1">선택</option>
+            <option value="1">1학년</option>
+            <option value="2">2학년</option>
+            <option value="3">3학년</option>
+            <option value="4">4학년</option>
+          </select>
+        </div>
+        <div class="dd-field">
+          <label for="type">구분</label>
+          <select id="type" name="type" required>
+            <option value="-1">선택</option>
+            <option value="0">자과</option>
+            <option value="1">타과</option>
+          </select>
+        </div>
+        <button type="button" id="add-course-btn">과목 추가</button>
+      </form>
     </header>
     <main>
       <section id="course-section"></section>

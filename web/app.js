@@ -20,15 +20,14 @@ const availableCourse = require('./util/available-course');
 
 // run course-searcher.py
 const courseSearcher = new PythonSpawn('course-searcher.py');
-// courseSearcher.spawnPython();
+//courseSearcher.spawnPython();
 module.exports.courseSearcher = courseSearcher;
 
 // run seat-checker.py
 const seatChecker = new PythonSpawn('seat-checker-mp.py');
-seatChecker.spawnPython();
-// console.log(seatChecker);
-availableCourse.handleAvailableCourses(seatChecker);
-// module.exports.seatChecker = seatChecker;
+//seatChecker.spawnPython();
+//availableCourse.handleAvailableCourses(seatChecker);
+module.exports.seatChecker = seatChecker;
 
 //server
 const app = express();

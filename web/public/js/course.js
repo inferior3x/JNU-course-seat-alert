@@ -5,44 +5,51 @@ const gradeElement = document.querySelector("#grade");
 const typeElement = document.querySelector("#type");
 const addCourseBtnElement = document.querySelector("#add-course-btn");
 const csrfElement = document.querySelector("#_csrf");
-
 //alert
-const messageElement = document.querySelector("#message");
-
+//const messageElement = document.querySelector("#message");
 //show course
 const courseSectionElement = document.querySelector("#course-section");
+
 
 function coursesUlGenerator(courses) {
   const ulElement = document.createElement("ul");
   ulElement.id = "courses-list";
   for (const course of courses) {
     course.type = course.type === "1" ? "타과" : "자과";
-    course.alerted = course.alerted == true ? "O" : "X";
+    course.alerted = course.alerted == true ? "여석 존재" : "여석 없음";
     const liElement = document.createElement("li");
     ulElement.appendChild(liElement);
+
     liElement.innerHTML = `
-        <span class="name_span">${course.name}</span>
-        <span class="code_span">${course.code}</span>
-        <span class="type_span">${course.type}</span>
-        <span class="alerted_span">${course.alerted}</span>
-        <button type="button" class="delete-course">삭제</button>
+      <div class="course-info">
+        <span class="name-span">${course.name}</span>
+        <span class="code-span">${course.code}</span>
+        <span class="divide-span">|</span>
+        <span class="type-span">${course.type}</span>
+        <span class="divide-span">|</span>
+        <span class="alerted-span">${course.alerted}</span>
+      </div>
+      <div class="delete-course">
+        <button  class="delete-course-btn" type="button">삭제</button>
+      <div>
     `;
   }
   return ulElement;
 }
 
 async function fetchCourse() {
+  showSpinner();
   try {
     const response = await fetch("/fetch-course");
     const responseData = await response.json();
-
+    hideSpinner();
     if (response.ok) {
       if (responseData.courses) {
         courseSectionElement.innerHTML = "";
         courseSectionElement.appendChild(
           coursesUlGenerator(responseData.courses)
         );
-        const deleteCourseBtnElement = document.querySelectorAll(".delete-course");
+        const deleteCourseBtnElement = document.querySelectorAll(".delete-course-btn");
         deleteCourseBtnElement.forEach((button) =>
           button.addEventListener("click", deleteCourse)
         );
@@ -54,12 +61,14 @@ async function fetchCourse() {
       return;
     }
   } catch (error) {
+    // console.log(error.message);
     alert("networking error");
+    hideSpinner();
   }
 }
 
 const addCourse = _.throttle(async (event) => {
-  console.log("did");
+  showSpinner();
   event.preventDefault();
   const bodyData = {
     name: nameElement.value,
@@ -76,13 +85,15 @@ const addCourse = _.throttle(async (event) => {
       headers: { "Content-Type": "application/json" },
     });
     const responseData = await response.json();
-
+    hideSpinner();
     if (response.ok) {
       if (!responseData.error) {
         await fetchCourse();
-        messageElement.textContent = "신청되었습니다.";
+        //alert('신청되었습니다.');
+        //messageElement.textContent = "신청되었습니다.";
       } else {
-        messageElement.textContent = responseData.message;
+        alert(responseData.message);
+        // messageElement.textContent = responseData.message;
       }
     } else {
       alert("failed");
@@ -90,13 +101,15 @@ const addCourse = _.throttle(async (event) => {
     }
   } catch (error) {
     alert("networking error");
+    hideSpinner();
   }
 }, 1500);
 
 const deleteCourse = _.throttle(async (event) => {
+  showSpinner();
   event.preventDefault();
 
-  const selectedCode = event.target.parentElement.querySelector(".code_span").textContent;
+  const selectedCode = event.target.parentElement.parentElement.querySelector(".code-span").textContent;
   const bodyData = { code: selectedCode };
   bodyData._csrf = csrfElement.value;
   //Object.assign(bodyData, { _csrf: csrfElement.value });
@@ -108,18 +121,22 @@ const deleteCourse = _.throttle(async (event) => {
       headers: { "Content-Type": "application/json" },
     });
     const responseData = await response.json();
+    hideSpinner();
     if (response.ok) {
       if (!responseData.error) {
         await fetchCourse();
-        messageElement.textContent = "삭제되었습니다.";
+        //alert('삭제되었습니다.');
+        // messageElement.textContent = "삭제되었습니다.";
       } else {
-        messageElement.textContent = responseData.message;
+        alert(responseData.message);
+        // messageElement.textContent = responseData.message;
       }
     } else {
       alert("failed");
       return;
     }
   } catch (error) {
+    showSpinner();
     alert("networking error");
   }
 }, 500);

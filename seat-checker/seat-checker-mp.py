@@ -43,17 +43,17 @@ if __name__ == "__main__":
             for i in range(PROCESS_NUMBER): #프로세스 종료
                 close_process(procs[i], parent_pipes[i], i) #동기
                 procs[i] = create_process(worker, (child_pipes[i],), i) #프로세스 시작 후 프로세스 객체 다시 할당
-            print('child restarted!')
             restart_child = False
             #자식이 켜질 때까지 기다림
             time.sleep(10)
 
-        #과목 가져오고, 과목 개수 얻고, 과목 개수에 따라 자식을 기다릴 기한 설정
+        #찾아야 할 과목 가져오고, 과목 개수 얻고, 과목 개수에 따라 자식을 기다릴 기한 설정
         courses = fetch_course_to_search()
         courses_num = len(courses)
+        #과목 없으면 그만 두기
+        if not courses_num:
+            time.sleep(10)
         deadline_to_wait_child = courses_num * DEADLINE_TO_FIND_ONE_COURSE #가중치 설정해줘야 할 수도 있음
-
-        print(deadline_to_wait_child) #
 
         #살아있는 프로세스 개수
         alive_proc_num = sum(1 for i in range(PROCESS_NUMBER) if procs[i].is_alive())
@@ -110,13 +110,13 @@ if __name__ == "__main__":
                     received_data_num += 1
             if received_data_num == sended_data_to_proc_num:
                 break
-            if (time.time() - start_time_to_wait_child) > deadline_to_wait_child:
-                restart_child = True
-                push_and_flush_stdout('log', f"timeover : failed to wait child")
-                break
+            # if (time.time() - start_time_to_wait_child) > deadline_to_wait_child:
+            #     restart_child = True
+            #     push_and_flush_stdout('log', f"timeover : failed to wait child")
+            #     break
 
-        #push_and_flush_stdout('log', f'wait_child: {round(time.time() - start_time_to_wait_child, 3)}s')
-        #push_and_flush_stdout('log', f'one_cycle: {round(time.time() - start_time_for_one_cycle, 3)}s')
+        push_and_flush_stdout('log', f'wait_child: {round(time.time() - start_time_to_wait_child, 3)}s')
+        push_and_flush_stdout('log', f'one_cycle: {round(time.time() - start_time_for_one_cycle, 3)}s')
 
               
 
