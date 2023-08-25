@@ -6,18 +6,12 @@ const process = require('../app');
 const {courseSearchingErrMsg} = require('../util/messages');
 
 async function getCourse(req, res) {
-    const user = new User(res.locals.user.id);
-    await user.fetchUserData({_id: 1})
-    
-    const courses = await Course.findCoursesByApplicant(user._id);
+    const courses = await Course.findCoursesByApplicantId(res.locals.user.id);
     res.render("course", {courses: courses});
 }
 
 async function fetchCourse(req, res) {
-    const user = new User(res.locals.user.id);
-    await user.fetchUserData({_id: 1})
-    
-    const courses = await Course.findCoursesByApplicant(user._id);
+    const courses = await Course.findCoursesByApplicantId(res.locals.user.id);
     res.json({courses: courses});
 }
 
@@ -37,27 +31,19 @@ async function addApplicantToCourse(req, res){
         if (result.errorType > 0)//크롤링 오류 발생
             return res.json({error: true, message: courseSearchingErrMsg[result.errorType]}); //오류 메세지 전달하기
 
-
         course.name = result.name;
         course.grade = grade;
         await course.create();
-        console.log(`강의 없어서 저장함`);
-    }else{
-        console.log(`강의 있어서 그대로 진행`);
     }
-    
-    //사용자 _id 불러오기
-    const user = new User(res.locals.user.id);
-    await user.fetchUserData({_id: 1});
 
     //이미 해당 과목 신청한 사람인 지 확인
-    if (await course.isExistingApplicant(user._id)){
+    if (await course.isExistingApplicant(res.locals.user.id)){
         return res.json({error: true, message: '신청된 과목입니다.'}); //이미 신청한 유저라고 알리기
     }
     
     //과목에 신청자 추가하기
     await course.modify({$push: {applicants: {
-        user: new ObjectId(user._id),
+        userId: res.locals.user.id,
         type: type,
     }}});
     return res.json({error: false});
@@ -65,9 +51,7 @@ async function addApplicantToCourse(req, res){
 
 async function deleteApplicantFromCourse(req, res) {
     const course = new Course(req.body.code);
-    const user = new User(res.locals.user.id);
-    await user.fetchUserData({_id: 1});
-    await course.deleteApplicant(user._id);
+    await course.deleteApplicant(res.locals.user.id);
     return res.json({error: false});
 }
 

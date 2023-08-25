@@ -118,6 +118,8 @@ if __name__ == "__main__":
         push_and_flush_stdout('log', f'wait_child: {round(time.time() - start_time_to_wait_child, 3)}s')
         push_and_flush_stdout('log', f'one_cycle: {round(time.time() - start_time_for_one_cycle, 3)}s')
 
+        time.sleep(10) #테스트 중에는 부하 줄이기
+
               
 
 
@@ -147,7 +149,7 @@ else:
 
     #여석 체크
     async def check_seat(page, courses_to_find):
-        available_courses = []
+        mutated_courses = []
         for course_to_find in courses_to_find:
             #드랍다운 선택
             await set_dropdown_by_index(page, GRADE_DD_ATT, course_to_find['grade'])
@@ -165,7 +167,7 @@ else:
             if len(courses) == 1: #과목 존재하지 않을 때
                 continue
 
-            #강의 중 내가 원하는 과목인지 확인하기 위해 반복
+            #강의 중 내가 원하는 과목인지 확인하기 위해 반복 : course는 한 수업의 데이터들을 배열로 가지고 있음
             for course in courses :
                 #빈 행 넘김
                 if not len(course) :
@@ -174,24 +176,27 @@ else:
                 #선택한 행이 내가 원하는 과목인지 체크 후 진행
                 if delete_whitespace(course[2]) == course_to_find['code'] : #course[2] : 과목코드-분반
                     #여석 수 가져오기
-                    digits = get_list_of_digit_in_string(course[8]) # course[8] : 여석 수
-                    
-                    remainder = -1
-                    #여석 수 체크
-                    if digits[0]+digits[3] and digits[1]+digits[4]:
-                        remainder = 2
-                    elif not digits[0]+digits[3] and digits[1]+digits[4]:
-                        remainder = 1
-                    elif digits[0]+digits[3] and not digits[1]+digits[4]:
-                        remainder = 0
+                    nums = get_list_of_digit_in_string(course[8]) # course[8] : 여석 수를 나타내는 문자열
+                    self_num = nums[0]+nums[3] #자과 여석 수
+                    other_num = nums[1]+nums[4] #타과 여석 수
 
-                    #여석 수 확인 후 있으면 진행
-                    if remainder != -1:
-                        available_courses.extend([(course_to_find['code'], remainder)])
+                    #여석 수 변동 확인
+                    self_status = -1
+                    other_status = -1
+                    if course_to_find['alertedSelf']:
+                        if self_num == 0: self_status = 0
+                    else:
+                        if self_num != 0: self_status = 1
+                    if course_to_find['alertedOther']:
+                        if other_num == 0: other_status = 0
+                    else:
+                        if other_num != 0: other_status = 1
 
-                        #과목 코드와 여석 현황(0-자과 1-타과 2-둘다) 반환
+                    #여석 수 변동있을경우 서버에 전달할 과목에 추가
+                    if self_status + other_status != -2 :
+                        mutated_courses.extend([(course_to_find['code'], self_status, other_status)])
 
-        return available_courses
+        return mutated_courses
 
     #자식 프로세스의 원동력
     def worker(pipe, pid):
@@ -219,12 +224,12 @@ else:
                     #for문으로 각 페이지에게 넘겨줘야 할 강의들을 태스크로 만들고 실행
                     tasks = [loop.create_task(check_seat(pages[i], courses[courses_ranges[i][0]:courses_ranges[i][1]+1])) for i in range(len(courses_ranges))]
                     #단일 스레드로 이벤트 루프가 실행되므로 경쟁 조건 발생하지 않기에, 동기화 매커니즘 작성X
-                    available_courses = loop.run_until_complete(asyncio.gather(*tasks))
-                    flattened_available_courses = [course for sublist in available_courses for course in sublist] #데이터 가공
+                    mutated_courses = loop.run_until_complete(asyncio.gather(*tasks))
+                    flattened_mutated_courses = [course for sublist in mutated_courses for course in sublist] #중첩된 리스트를 가공해서 1차? 중첩되지 않은? 리스트로 변환
 
                     try:
                         pipe.send(True)
-                        push_and_flush_stdout('finding', flattened_available_courses)
+                        push_and_flush_stdout('finding', flattened_mutated_courses)
                     except Exception as error:
                         ##실패하면 received_data 어떻게 처리하게 할지?
                         pipe.send(False)

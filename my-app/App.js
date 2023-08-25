@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Text, View, Button, Platform, ActivityIndicator } from 'react-native';
+import { Text, View, Platform, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -14,27 +14,6 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
-
-// Can use this function below or use Expo's Push Notification Tool from: https://expo.dev/notifications
-async function sendPushNotification(expoPushToken) {
-  const message = {
-    to: expoPushToken,
-    sound: 'default',
-    title: 'Original Title',
-    body: 'And here is the body!',
-    data: { someData: 'goes here' },
-  };
-
-  await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Accept-encoding': 'gzip, deflate',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(message),
-  });
-}
 
 async function registerForPushNotificationsAsync() {
   let token;
@@ -118,12 +97,12 @@ export default function App() {
       ) : (
         <ActivityIndicator size="large" />
       )}
-      <Text>Your expo push token: {expoPushToken}</Text>
+      {/* <Text>Your expo push token: {expoPushToken}</Text>
       <View style={{ alignItems: 'center', justifyContent: 'center' }}>
         <Text>Title: {notification && notification.request.content.title} </Text>
         <Text>Body: {notification && notification.request.content.body}</Text>
         <Text>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>
-      </View>
+      </View> */}
     </View>
   );
 }

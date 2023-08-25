@@ -15,17 +15,17 @@ const authRouter = require("./routes/auth");
 const courseRouter = require("./routes/course");
 
 const PythonSpawn = require('./util/python-spawn');
-const availableCourse = require('./util/available-course');
+const mutatedCourse = require('./util/mutated-course');
 
 // run course-searcher.py
 const courseSearcher = new PythonSpawn('course-searcher.py');
-//courseSearcher.spawnPython();
+courseSearcher.spawnPython();
 module.exports.courseSearcher = courseSearcher;
 
 // run seat-checker.py
 const seatChecker = new PythonSpawn('seat-checker-mp.py');
-//seatChecker.spawnPython();
-//availableCourse.handleAvailableCourses(seatChecker);
+seatChecker.spawnPython();
+mutatedCourse.handleMutatedCourses(seatChecker);
 module.exports.seatChecker = seatChecker;
 
 //server

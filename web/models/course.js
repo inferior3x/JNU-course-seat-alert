@@ -13,8 +13,8 @@ class Course {
                 code: this.code,
                 name: this.name,
                 grade: this.grade,
-                alertedSelf: false,
-                alertedOther: false,
+                alertedSelf: 0,
+                alertedOther: 0,
                 applicants: []
             });
         }catch(error){
@@ -23,7 +23,7 @@ class Course {
         }
     }
 
-    async find(projection) {
+    async fetchCourse(projection) {
         const course = await db.getDb().collection('courses').findOne({code: this.code}, {projection: projection});
         if (course)
             Object.assign(this, course);
@@ -34,8 +34,8 @@ class Course {
         return course ? true : false ;
     }
 
-    async isExistingApplicant(user_id) {
-        const user = await db.getDb().collection('courses').findOne({code: this.code, 'applicants.user': new ObjectId(user_id)});
+    async isExistingApplicant(userId) {
+        const user = await db.getDb().collection('courses').findOne({code: this.code, 'applicants.userId': userId});
         return user ? true : false ;
     }
 
@@ -47,16 +47,16 @@ class Course {
         
     }
     
-    async deleteApplicant(user_id) {
-        return await db.getDb().collection('courses').updateMany({code: this.code}, {$pull: {applicants: {user: new ObjectId(user_id)}}});
+    async deleteApplicant(userId) {
+        return await db.getDb().collection('courses').updateMany({code: this.code}, {$pull: {applicants: {userId: userId}}});
     }
 
-    static async findCoursesByApplicant(user_id) {
-        const courses = await db.getDb().collection('courses').find({'applicants.user': new ObjectId(user_id)}, {projection: {_id: 0, code: 1, name: 1, alertedSelf: 1, alertedOther: 1, 'applicants.$': 1}}).toArray();
+    static async findCoursesByApplicantId(userId) {
+        const courses = await db.getDb().collection('courses').find({'applicants.userId': userId}, {projection: {_id: 0, code: 1, name: 1, alertedSelf: 1, alertedOther: 1, 'applicants.$': 1}}).toArray();
         if (courses) {
             for (const course of courses){
                 course.type = course.applicants[0].type;
-                course.alerted = (course.type === '1' ? course.alertedOther : course.alertedSelf); //1 타과 0 자과
+                course.alerted = (course.type === '1' ? course.alertedOther : course.alertedSelf);
                 delete course.alertedSelf;
                 delete course.alertedOther;
                 delete course.applicants;
