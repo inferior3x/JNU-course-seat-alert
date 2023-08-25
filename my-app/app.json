@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "전남대학교 여석 알리미",
+    "name": "전남대학교 여석 알림",
     "slug": "my-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -18,11 +18,12 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.coco3x.jnuseatalert",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.coco3x.jnuseatalert"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -9,7 +9,7 @@ router.get("/course", courseControllers.getCourse);
 
 router.get("/fetch-course", courseControllers.fetchCourse);
 
-router.post("/add-course", courseControllers.addCourse);
+router.post("/add-course", courseControllers.addApplicantToCourse);
 
 router.post("/delete-course", courseControllers.deleteApplicantFromCourse);
 

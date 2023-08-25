@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const Session = require('../models/session');
 const validation = require('../util/validation');
-const validationSession = require('../util/validation-session');
 
 function gotoSignup(req, res) {
     res.redirect("/signup");
@@ -10,33 +10,12 @@ function gotoSignup(req, res) {
 function getSignup(req, res) {
     if (res.locals.isAuthenticated)
         return res.redirect('/course');
-
-    // let inputData = validationSession.getErrorInputData(req);
-    // if (!inputData)
-    //   inputData = validationSession.getEmptyInputData(
-    //     {
-    //       id: '',
-    //       password: '',
-    //       password2: '',
-    //     }
-    //   );
-    // res.render("signup", {inputData: inputData});
     res.render("signup");
 }
 
 function getLogin(req, res) {
     if (res.locals.isAuthenticated)
-    return res.redirect('/course');
-
-    // let inputData = validationSession.getErrorInputData(req);
-    // if (!inputData)
-    //   inputData = validationSession.getEmptyInputData(
-    //     {
-    //       id: '',
-    //       password: '',
-    //     }
-    //   );
-    // res.render("login", {inputData: inputData});
+      return res.redirect('/course');
     res.render("login");
 }
 
@@ -44,43 +23,23 @@ async function signup(req, res) {
     const enteredId = req.body['user-id'];
     const enteredPassword = req.body['user-pw'];
     const enteredPassword2 = req.body['user-pw2'];
-  
+
     //입력값 유효성 검사
     if ( !validation.isSignupInfoValid(enteredId, enteredPassword, enteredPassword2)){
-      // validationSession.setErrorInputData(req, 
-      //   '기입 정보를 다시 확인해주세요.', 
-      //   {
-      //     id: enteredId,
-      //     password: enteredPassword,
-      //     password2: enteredPassword2,
-      //   },
-      //   () => res.redirect('/signup')
-      // )
-      // return;
       return res.json({error: true, message: '기입 정보를 다시 확인해주세요.'});
     }
   
     //아이디 중복 확인
     const user = new User(enteredId);
     if (await user.checkExistence()){
-      // validationSession.setErrorInputData(req, 
-      //   '해당 아이디는 사용할 수 없습니다.', 
-      //   {
-      //     id: enteredId,
-      //     password: enteredPassword,
-      //     password2: enteredPassword2,
-      //   },
-      //   () => res.redirect('/signup')
-      // )
-      // return;
       return res.json({error: true, message: '해당 아이디는 사용할 수 없습니다.'});
     }
-  
+
     //아이디 생성
     user.password = await bcrypt.hash(enteredPassword, 12);
     await user.create();
   
-    //자동 로그인
+    //자동 로그인?
   
     res.json({error: false});
 }
@@ -88,42 +47,34 @@ async function signup(req, res) {
 async function login(req, res) {
     const enteredId = req.body['user-id'];
     const enteredPassword = req.body['user-pw'];
-  
+    const pushToken = req.body['push-token'];
+    console.log(pushToken);
+
     const user = new User(enteredId);
-    await user.find();
+    await user.fetchUserData();
   
-    //유저 존재하지 않을 때
-    if (!user._id) {
-      // validationSession.setErrorInputData(req, 
-      //   '아이디 혹은 비밀번호가 일치하지 않습니다.', 
-      //   {
-      //     id: enteredId,
-      //     password: enteredPassword,
-      //   },
-      //   () => res.redirect('/login')
-      // )
-      // return;
+    //유저 존재하지 않을 때 리턴
+    if (!user._id)
       return res.json({error: true, message: '아이디 혹은 비밀번호가 일치하지 않습니다.'});
-    }
   
-    //비밀번호 맞는지 확인
+    //비밀번호 틀릴 때 리턴
     const isPasswordCorrect = await bcrypt.compare(enteredPassword, user.password);
-    if(!isPasswordCorrect){
-      // validationSession.setErrorInputData(req, 
-      //   '아이디 혹은 비밀번호가 일치하지 않습니다.', 
-      //   {
-      //     id: enteredId,
-      //     password: enteredPassword,
-      //   },
-      //   () => res.redirect('/login')
-      // )
-      // return;
+    if(!isPasswordCorrect)
       return res.json({error: true, message: '아이디 혹은 비밀번호가 일치하지 않습니다.'});
-    }
-  
-    //로그인, 세션 쿠키 추가
+    
+    //토큰 없을 때 리턴
+    if (!pushToken.includes('Expo')) //pushToken = ExponentPushToken[...]
+      return res.json({error: true, message: '토큰 없음'});
+
+    //세션 삭제
+    const session = new Session(user.id, pushToken); 
+    await session.deleteSessionsById(); //아이디가 같은 세션은 다 삭제(자동 로그아웃 기능 + 여러 기기로 알림 보내기 방지)
+    await session.deleteSessionsByPushToken(); //푸시 토큰이 같은 세션 다 삭제(한 기기에서 패러렐즈 같은걸 사용하여 여러 계정으로 알림을 받는 것을 방지)
+
+    //세션 쿠키 추가
     req.session['user'] = {
       id: enteredId,
+      pushToken: pushToken,
     }
     req.session.isAuthenticated = true;
     req.session.save(() => res.json({error: false}));

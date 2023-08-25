@@ -1,6 +1,7 @@
 const db = require('../database/database');
 const {ObjectId} = require('mongodb');
 
+//User 인스턴스의 메서드는 this.id가 있어야 사용 가능
 class User {
     constructor(id, password) {
         this.id = id;
@@ -29,7 +30,7 @@ class User {
         await db.getDb().collection('users').updateOne({id: this.id}, field);
     }
 
-    async find(projection) {
+    async fetchUserData(projection) {
         const user = await db.getDb().collection('users').findOne({id: this.id}, {projection: projection});
         if (user){
             Object.assign(this, user);

@@ -7,22 +7,21 @@ const {courseSearchingErrMsg} = require('../util/messages');
 
 async function getCourse(req, res) {
     const user = new User(res.locals.user.id);
-    await user.find({_id: 1})
+    await user.fetchUserData({_id: 1})
     
     const courses = await Course.findCoursesByApplicant(user._id);
-    //console.dir(courses);
     res.render("course", {courses: courses});
 }
 
 async function fetchCourse(req, res) {
     const user = new User(res.locals.user.id);
-    await user.find({_id: 1})
+    await user.fetchUserData({_id: 1})
     
     const courses = await Course.findCoursesByApplicant(user._id);
     res.json({courses: courses});
 }
 
-async function addCourse(req, res){
+async function addApplicantToCourse(req, res){
     const {name, code, grade, type} = req.body;
     
     if (!validation.isCourseInfoValid(name, code, grade, type)){
@@ -49,7 +48,7 @@ async function addCourse(req, res){
     
     //사용자 _id 불러오기
     const user = new User(res.locals.user.id);
-    await user.find({_id: 1});
+    await user.fetchUserData({_id: 1});
 
     //이미 해당 과목 신청한 사람인 지 확인
     if (await course.isExistingApplicant(user._id)){
@@ -60,7 +59,6 @@ async function addCourse(req, res){
     await course.modify({$push: {applicants: {
         user: new ObjectId(user._id),
         type: type,
-        pushToken: '',
     }}});
     return res.json({error: false});
 }
@@ -68,9 +66,9 @@ async function addCourse(req, res){
 async function deleteApplicantFromCourse(req, res) {
     const course = new Course(req.body.code);
     const user = new User(res.locals.user.id);
-    await user.find({_id: 1});
+    await user.fetchUserData({_id: 1});
     await course.deleteApplicant(user._id);
     return res.json({error: false});
 }
 
-module.exports = {getCourse:getCourse, addCourse:addCourse, deleteApplicantFromCourse: deleteApplicantFromCourse, fetchCourse:fetchCourse};
+module.exports = {getCourse:getCourse, addApplicantToCourse:addApplicantToCourse, deleteApplicantFromCourse: deleteApplicantFromCourse, fetchCourse:fetchCourse};

@@ -4,22 +4,6 @@ const pw2Element = document.querySelector("#user-pw2");
 const signupBtnElement = document.querySelector("#spotlight-btn");
 const csrfElement = document.querySelector("#_csrf");
 
-// pwCheckElement.addEventListener('input', (event) => {
-//     if (pwCheckElement.value !== pwElement.value){
-//         pwElement.style.backgroundColor = 'red';
-//         pwCheckElement.style.backgroundColor = 'red';
-//     }else{
-//         pwElement.style.backgroundColor = 'green';
-//         pwCheckElement.style.backgroundColor = 'green';
-//     }
-// });
-
-// submitElement.addEventListener('click', (event) => {
-//     if (pwCheckElement.value !== pwElement.value){
-//         event.preventDefault();
-//     }
-// });
-
 const signup = _.throttle(async (event) => {
     showSpinner();
     event.preventDefault();
