@@ -226,13 +226,14 @@ else:
                     
                     #for문으로 각 페이지에게 넘겨줘야 할 강의들을 태스크로 만들고 실행
                     tasks = [loop.create_task(check_seat(pages[i], courses[courses_ranges[i][0]:courses_ranges[i][1]+1])) for i in range(len(courses_ranges))]
-                    #단일 스레드로 이벤트 루프가 실행되므로 경쟁 조건 발생하지 않기에, 동기화 매커니즘 작성X
+                    #각 페이지로부터 반환된 리스트가 한 리스트로 합쳐져 반환 (따라서 mutated_courses는 한 프로세스의 결과물)
                     mutated_courses = loop.run_until_complete(asyncio.gather(*tasks))
                     flattened_mutated_courses = [course for sublist in mutated_courses for course in sublist] #중첩된 리스트를 가공해서 1차? 중첩되지 않은? 리스트로 변환
 
                     try:
                         pipe.send(True)
-                        push_and_flush_stdout('finding', flattened_mutated_courses)
+                        if len(flattened_mutated_courses):
+                            push_and_flush_stdout('finding', flattened_mutated_courses)
                     except Exception as error:
                         ##실패하면 received_data 어떻게 처리하게 할지?
                         pipe.send(False)

@@ -7,6 +7,7 @@ const addCourseBtnElement = document.querySelector("#add-course-btn");
 const csrfElement = document.querySelector("#_csrf");
 
 //show course
+const appliedCourseStatusElement = document.querySelector("#applied-course-status");
 const courseSectionElement = document.querySelector("#course-section");
 
 function coursesUlGenerator(courses) {
@@ -40,6 +41,8 @@ async function fetchCourse() {
   await fetchByGet("/fetch-course",
     (responseData) => {
       if (responseData.courses) {
+        appliedCourseStatusElement.children[0].textContent = responseData.courses.length;
+        appliedCourseStatusElement.children[1].textContent = 4;
         courseSectionElement.innerHTML = "";
         courseSectionElement.appendChild(coursesUlGenerator(responseData.courses));
         const deleteCourseBtnElement = document.querySelectorAll(".delete-course-btn");

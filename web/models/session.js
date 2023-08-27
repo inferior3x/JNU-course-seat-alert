@@ -9,9 +9,22 @@ class Session {
     }
 
     async fetchSession(projection) {
-        const session = await db.getDb().collection('sessions').findOne({'session.user.id': this.id}, {projection: projection});
+        const session = await db.getDb().collection('sessions').findOne({'session.user.id': this.id, 'session.isAuthenticated': true}, {projection: projection});
         if (session)
             Object.assign(this, session);
+    }
+
+    async isExistingSession() {
+        const session = await db.getDb().collection('sessions').findOne({'session.user.id': this.id, 'session.isAuthenticated': true});
+        return session ? true : false ;
+    }
+
+    async logoutSessionsById() {
+        await db.getDb().collection('sessions').updateMany({'session.user.id': this.id}, {$set: {'session.isAuthenticated': false}});
+    }
+
+    async logoutSessionsByPushToken() {
+        await db.getDb().collection('sessions').updateMany({'session.user.pushToken': this.pushToken}, {$set: {'session.isAuthenticated': false}});
     }
 
     async deleteSessionsById() {

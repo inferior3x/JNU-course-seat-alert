@@ -7,8 +7,12 @@ async function fetchByPost(path, bodyData, funcForNotError, funcForError) {
           body: JSON.stringify(bodyData),
           headers: { "Content-Type": "application/json" },
         });
-        const responseData = await response.json();
+        if (response.status === 401){
+          showOkModal("계정이 로그아웃되었습니다.", ()=>{window.location.href = '/login';});
+          return;
+        }
         if (response.ok) {
+          const responseData = await response.json();
           if (!responseData.error) {
             funcForNotError(responseData);
           } else {
@@ -27,8 +31,12 @@ async function fetchByPost(path, bodyData, funcForNotError, funcForError) {
 async function fetchByGet(path, funcForNotError, funcForError) {
   try {
     const response = await fetch(path);
-    const responseData = await response.json();
+    if (response.status === 401){
+      showOkModal("계정이 로그아웃되었습니다.", ()=>{window.location.href = '/login';});
+      return;
+    }
     if (response.ok) {
+      const responseData = await response.json();
       if (!responseData.error){
         funcForNotError(responseData);
       }else{

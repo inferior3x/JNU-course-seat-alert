@@ -29,8 +29,9 @@ async function signup(req, res) {
     const enteredPassword2 = req.body['user-pw2'];
 
     //입력값 유효성 검사
-    if ( !validation.isSignupInfoValid(enteredId, enteredPassword, enteredPassword2)){
-      return res.json({error: true, message: '기입 정보를 다시 확인해주세요.'});
+    const signupInfoVaildResult = validation.isSignupInfoValid(enteredId, enteredPassword, enteredPassword2);
+    if (signupInfoVaildResult.error){
+      return res.json({error: true, message: signupInfoVaildResult.message});
     }
   
     //아이디 중복 확인
@@ -53,7 +54,6 @@ async function login(req, res) {
     const enteredId = req.body['user-id'];
     const enteredPassword = req.body['user-pw'];
     const pushToken = req.body['push-token'];
-    console.log(pushToken);
 
     const user = new User(enteredId);
     await user.fetchUserData();
@@ -73,10 +73,10 @@ async function login(req, res) {
 
     //위 조건을 모두 통과했을 때 로그인 수행
     
-    //세션 삭제
+    //같은 계정 및 같은 디바이스의 세션들을 로그아웃
     const session = new Session(user.id, pushToken); 
-    await session.deleteSessionsById(); //아이디가 같은 세션은 다 삭제(자동 로그아웃 기능 + 여러 기기로 알림 보내기 방지)
-    await session.deleteSessionsByPushToken(); //푸시 토큰이 같은 세션 다 삭제(한 기기에서 패러렐즈 같은걸 사용하여 여러 계정으로 알림을 받는 것을 방지)
+    await session.logoutSessionsById(); //아이디가 같은 세션은 다 삭제(자동 로그아웃 기능 + 여러 기기로 알림 보내기 방지)
+    await session.logoutSessionsByPushToken(); //푸시 토큰이 같은 세션 다 삭제(한 기기에서 패러렐즈 같은걸 사용하여 여러 계정으로 알림을 받는 것을 방지)
 
     //세션 쿠키 추가
     req.session['user'] = {

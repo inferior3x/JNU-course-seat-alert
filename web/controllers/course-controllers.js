@@ -22,7 +22,14 @@ async function fetchCourse(req, res) {
 //알림 신청한 사용자를 과목에 추가하기
 async function addApplicantToCourse(req, res){
     const {name, code, grade, type} = req.body;
+    let modifiedName = name;
+
+    //과목 이름에서 괄호 시작 부분부터 없애기
+    const indexOfParentheses = name.indexOf('(');
+    if (indexOfParentheses !== -1)
+        modifiedName = name.substring(0, indexOfParentheses);
     
+    //과목 정보 입력 다 했는지 확인
     if (!validation.isCourseInfoValid(name, code, grade, type))
         return res.json({error: true, message: '유효하지 않은 입력입니다.'});
 
@@ -30,7 +37,7 @@ async function addApplicantToCourse(req, res){
     const course = new Course(code);
     const userId = res.locals.user.id;
     if (!await course.isExistingCourse()){//db에 등록된 수업이 없을 때 크롤링
-        process.courseSearcher.passData({id: userId, name: name, code: code, grade: grade});
+        process.courseSearcher.passData({id: userId, name: modifiedName, code: code, grade: grade});
         const result = await process.courseSearcher.receiveData(); // result = {'errorType': -1, 'name': '과목이름'}
 
         if (result.errorType > 0)//크롤링 오류 발생

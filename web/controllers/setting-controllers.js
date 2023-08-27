@@ -39,8 +39,8 @@ async function logout(req, res) {
     const userId = res.locals.user.id;
     const session = new Session(userId);
 
-    //세션 삭제
-    await session.deleteSessionsById();
+    //세션의 인증 - false
+    await session.logoutSessionsById();
     
     return res.json({error: false});
 }

@@ -68,13 +68,14 @@ form{
     border: 1px solid grey;
 }
 
+#applied-course-status {
+    margin: 3%;
+}
+
 #courses-list {
-    /* position: fixed;
-    top: 200px;
-    padding: 200px; */
     list-style: none;
     padding: 0;
-    margin: 5%;
+    margin: 0 5%;
     color: rgb(60,60,60);
     width: 90%;
 }
@@ -84,7 +85,7 @@ form{
     justify-content: space-between;
     background-color: rgb(230, 239, 236);
     border-radius: 12px;
-    margin: 0.8rem 0;
+    margin: 0 0 0.8rem 0;
     width: 100%;
     box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }

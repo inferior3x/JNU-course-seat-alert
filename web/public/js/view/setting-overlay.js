@@ -9,7 +9,7 @@ const accountDeleteBtnElement = document.querySelector('#account-delete-btn');
 const logoutBtnElement = document.querySelector('#logout-btn');
 
 
-async function initAccount() {
+const initAccount = _.throttle(async () => {
   const bodyData = {};
   bodyData._csrf = csrfElement.value;
 
@@ -22,9 +22,10 @@ async function initAccount() {
     (responseData) => {showOkModal(responseData.message)},
   );
   hideSpinner();
-}
+}, 
+1500);
 
-async function deleteAccount() {
+const deleteAccount = _.throttle(async () => {
   const bodyData = {};
   bodyData._csrf = csrfElement.value;
 
@@ -35,9 +36,10 @@ async function deleteAccount() {
     (responseData) => {showOkModal(responseData.message)},
   );
   hideSpinner();
-}
+}, 
+1500);
 
-async function logout() {
+const logout = _.throttle(async () => {
   const bodyData = {};
   bodyData._csrf = csrfElement.value;
   
@@ -48,7 +50,8 @@ async function logout() {
     (responseData) => {showOkModal(responseData.message)},
   );
   hideSpinner();
-}
+},
+1500);
 
 
 //setting btn
