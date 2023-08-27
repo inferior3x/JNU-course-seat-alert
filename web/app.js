@@ -13,6 +13,7 @@ const localsMiddleware = require('./middlewares/locals-middleware');
 
 const authRouter = require("./routes/auth");
 const courseRouter = require("./routes/course");
+const settingRouter = require("./routes/setting");
 
 const PythonSpawn = require('./util/python-spawn');
 const mutatedCourse = require('./util/mutated-course');
@@ -24,8 +25,8 @@ module.exports.courseSearcher = courseSearcher;
 
 // run seat-checker.py
 const seatChecker = new PythonSpawn('seat-checker-mp.py');
-seatChecker.spawnPython();
-mutatedCourse.handleMutatedCourses(seatChecker);
+//seatChecker.spawnPython();
+//mutatedCourse.handleMutatedCourses(seatChecker);
 module.exports.seatChecker = seatChecker;
 
 //server
@@ -52,13 +53,16 @@ app.use(csrfMiddleware.setLocalCsrfToken);
 //session to locals
 app.use(localsMiddleware.setSession);
 
-//400
+//401
 app.get('/401', (req, res) => res.status(401).render('401'));
-app.get('/404', (req, res) => res.status(404).render('404'));
 
 //routers
 app.use(authRouter);
 app.use(courseRouter);
+app.use(settingRouter);
+
+//404
+app.use((req, res) => res.status(404).render('404'));
 
 //500
 // app.use(function (error, req, res, next) {

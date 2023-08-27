@@ -72,7 +72,7 @@ async def main():
             
             #강의 없을 때
             if found == 0:
-                print(json.dumps({'errorType': 4}))
+                print(json.dumps({'errorType': 2}))
                 sys.stdout.flush()
 
         except:

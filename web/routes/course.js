@@ -3,14 +3,12 @@ const router = express.Router();
 const courseControllers = require('../controllers/course-controllers');
 const authMiddleware = require("../middlewares/auth-middleware");
 
-router.use(authMiddleware.checkAuthentication);
+router.get("/course", authMiddleware.checkAuthentication, courseControllers.getCourse);
 
-router.get("/course", courseControllers.getCourse);
+router.get("/fetch-course", authMiddleware.checkAuthentication, courseControllers.fetchCourse);
 
-router.get("/fetch-course", courseControllers.fetchCourse);
+router.post("/add-course", authMiddleware.checkAuthentication, courseControllers.addApplicantToCourse);
 
-router.post("/add-course", courseControllers.addApplicantToCourse);
-
-router.post("/delete-course", courseControllers.deleteApplicantFromCourse);
+router.post("/delete-course", authMiddleware.checkAuthentication, courseControllers.deleteApplicantFromCourse);
 
 module.exports = router;

@@ -14,15 +14,15 @@ class User {
                 id: this.id, 
                 password: this.password, 
                 isAdmin: false,
+                applied_course_num: 0,
             });
         }catch(error){
-            console.log(`could not insert this user : ${this.id}
+            console.log(`could not insert this user's info : ${this.id}
             ${error.message}`);
         }
-
     }
 
-    async delete() {
+    async deleteUserById() {
         await db.getDb().collection('users').deleteOne({id: this.id});
     }
 

@@ -1,8 +1,6 @@
 import nest_asyncio
 import asyncio
 import time
-import sys
-import json
 nest_asyncio.apply()
 
 #부모에서는 쓰지 않을거라 선언만 해둠
@@ -32,12 +30,13 @@ if __name__ == "__main__":
     #자식이 켜질 때까지 기다림
     time.sleep(10)
 
-    restart_child = False #자식 프로세스를 종료하고 다시 시작할지 나타냄 - 오류라고 판단될 경우 설정
+    restart_child = False #자식 프로세스를 종료하고 다시 시작할지 나타냄 - 오류라고 판단될 경우 설정함
 
+    #찾을 과목 가져오고, 자식들에게 나눠서 보내고, 자식들의 작업이 끝나면 다시 반복
     while True:
         start_time_for_one_cycle = time.time()
 
-        #프로세스 재시작할지?
+        #자식 프로세스 재시작할지?
         if restart_child == True:
             unused_count = [0] * PROCESS_NUMBER # 프로세스가 사용되지 않은 횟수 초기화
             for i in range(PROCESS_NUMBER): #프로세스 종료
@@ -50,14 +49,18 @@ if __name__ == "__main__":
         #찾아야 할 과목 가져오고, 과목 개수 얻고, 과목 개수에 따라 자식을 기다릴 기한 설정
         courses = fetch_course_to_search()
         courses_num = len(courses)
-        #과목 없으면 그만 두기
-        if not courses_num:
-            time.sleep(10)
-        deadline_to_wait_child = courses_num * DEADLINE_TO_FIND_ONE_COURSE #가중치 설정해줘야 할 수도 있음
 
         #살아있는 프로세스 개수
         alive_proc_num = sum(1 for i in range(PROCESS_NUMBER) if procs[i].is_alive())
-        push_and_flush_stdout('log', f'alive_proc:{alive_proc_num}')
+
+        push_and_flush_stdout('log', f'course_num:{courses_num}; alive_proc:{alive_proc_num};')
+
+        #신청 과목 없을 땐 살아있는 프로세스도 없어야 함. 둘 다 0이면 다음 로직을 실행하지 않고 과목 수만 체크할 수 있도록 continue 실행
+        if not courses_num and not alive_proc_num:
+            time.sleep(10)
+            continue
+
+        deadline_to_wait_child = courses_num * DEADLINE_TO_FIND_ONE_COURSE #가중치 설정해줘야 할 수도 있음
 
         #courses_ranges : 자식들에게 각각 전달할 범위 설정
         if courses_num < PROCESS_NUMBER * PAGE_NUMBER: 
@@ -118,7 +121,7 @@ if __name__ == "__main__":
         push_and_flush_stdout('log', f'wait_child: {round(time.time() - start_time_to_wait_child, 3)}s')
         push_and_flush_stdout('log', f'one_cycle: {round(time.time() - start_time_for_one_cycle, 3)}s')
 
-        time.sleep(10) #테스트 중에는 부하 줄이기
+        time.sleep(5) #테스트 중에는 부하 줄이기
 
               
 

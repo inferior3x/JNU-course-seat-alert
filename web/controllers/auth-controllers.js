@@ -3,22 +3,26 @@ const User = require('../models/user');
 const Session = require('../models/session');
 const validation = require('../util/validation');
 
+//회원가입 페이지로 리다이렉션
 function gotoSignup(req, res) {
     res.redirect("/signup");
 }
 
+//회원가입 페이지 렌더링
 function getSignup(req, res) {
     if (res.locals.isAuthenticated)
         return res.redirect('/course');
     res.render("signup");
 }
 
+//로그인 페이지 렌더링
 function getLogin(req, res) {
     if (res.locals.isAuthenticated)
       return res.redirect('/course');
     res.render("login");
 }
 
+//회원가입 요청
 async function signup(req, res) {
     const enteredId = req.body['user-id'];
     const enteredPassword = req.body['user-pw'];
@@ -44,6 +48,7 @@ async function signup(req, res) {
     res.json({error: false});
 }
 
+//로그인 요청
 async function login(req, res) {
     const enteredId = req.body['user-id'];
     const enteredPassword = req.body['user-pw'];
@@ -66,6 +71,8 @@ async function login(req, res) {
     if (!pushToken.includes('Expo')) //pushToken = ExponentPushToken[...]
       return res.json({error: true, message: '토큰 없음'});
 
+    //위 조건을 모두 통과했을 때 로그인 수행
+    
     //세션 삭제
     const session = new Session(user.id, pushToken); 
     await session.deleteSessionsById(); //아이디가 같은 세션은 다 삭제(자동 로그아웃 기능 + 여러 기기로 알림 보내기 방지)

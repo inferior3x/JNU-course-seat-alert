@@ -1,11 +1,14 @@
 <%- include('includes/head.ejs') %>
     <link rel="stylesheet" href="css/course.css"></link>
-    <script src="/js/course.js" defer></script>
-  </head>
+    <link rel="stylesheet" href="css/setting-overlay.css"></link>
+    <script src="/js/view/course.js" defer></script>
+    </head>
   <body>
-    <div class="layerPopup">
-      <div class="spinner"></div>
-    </div>
+    <!-- modals -->
+    <%- include('includes/modals.ejs') %>
+    <!-- loading spinner -->
+    <%- include('includes/loading-spinner.ejs') %>
+
     <header>
       <form>
         <input type="hidden" name="_csrf" id="_csrf" value="<%=locals.csrfToken%>">
@@ -38,9 +41,19 @@
         <button type="button" id="add-course-btn">과목 추가</button>
       </form>
     </header>
+
     <main>
       <section id="course-section"></section>
     </main>
-    <footer></footer>
+
+    <footer>
+      <img id="setting-btn" src="img/setting.svg">
+    </footer>
+
+    <!-- setting overlay -->
+    <%- include('includes/setting-overlay.ejs') %>
+    <script src="js/view/setting-overlay.js"></script>
+
+    
   </body>
 </html>

@@ -1,11 +1,13 @@
 <%- include('includes/head.ejs') %>
-    <link  rel="stylesheet" href="css/auth_shared.css"></link>
-    <script src="/js/login.js" defer></script>
+    <link rel="stylesheet" href="css/auth_shared.css"></link>
+    <script src="/js/view/login.js" defer></script>
   </head>
   <body>
-    <div class="layerPopup">
-      <div class="spinner"></div>
-    </div>
+    <!-- modals -->
+    <%- include('includes/modals.ejs') %>
+    <!-- loading spinner -->
+    <%- include('includes/loading-spinner.ejs') %>
+
     <img src="img/jnu_logo.svg" alt="전남대학교 로고" id="jnu-logo">
     <form action="/login" method="POST">
       <input type="hidden" name="_csrf" id="_csrf" value="<%= locals.csrfToken %>">
@@ -18,10 +20,11 @@
         <label for="user-pw">비밀번호</label>
         <input class="personal-info-input" type="password" name="user-pw" id="user-pw" required/>
       </div>
-      <button id="spotlight-btn">로그인</button>
+      <button id="spotlight-btn" type="button">로그인</button>
     </form>
     <form action="/signup" method="GET">
       <button id="non-spotlight-btn">회원가입</button>
     </form>
+
   </body>
 </html>

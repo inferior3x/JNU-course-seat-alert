@@ -47,8 +47,12 @@ class Course {
         
     }
     
-    async deleteApplicant(userId) {
+    async deleteApplicantFromOne(userId) {
         return await db.getDb().collection('courses').updateMany({code: this.code}, {$pull: {applicants: {userId: userId}}});
+    }
+
+    static async deleteApplicantFromAll(userId) {
+        return await db.getDb().collection('courses').updateMany({}, {$pull: {applicants: {userId: userId}}});
     }
 
     static async findCoursesByApplicantId(userId) {
