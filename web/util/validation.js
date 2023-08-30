@@ -18,4 +18,11 @@ function isCourseInfoValid(name, code, grade, type){
     parseInt(type) >= 0 ;
 }
 
-module.exports = {isSignupInfoValid: isSignupInfoValid, isCourseInfoValid: isCourseInfoValid};
+function isUndefined(...data){
+    for (datum of data)
+        if (datum === undefined)
+            return true;
+    return false;
+}
+
+module.exports = {isSignupInfoValid: isSignupInfoValid, isCourseInfoValid: isCourseInfoValid, isUndefined:isUndefined};

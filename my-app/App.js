@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Text, View, Platform, ActivityIndicator } from 'react-native';
+import { Text, View, Platform, ActivityIndicator, StatusBar } from 'react-native';
 import { WebView } from 'react-native-webview';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -87,22 +87,17 @@ export default function App() {
   };
 
   return (
-    <View style={{ flex: 1}}>
+    <View style={{flex: 1}}>
+      <StatusBar backgroundColor="#008000" barStyle="dark-content" />
       {isTokenReady ? (
         <WebView
         ref={webViewRef}
-        source={{ uri: 'http://192.168.11.18:3000' }}
+        source={{ uri: 'http://13.209.41.105:80' }}
         onLoadEnd={handleWebViewLoadEnd}
         />
       ) : (
         <ActivityIndicator size="large" />
       )}
-      {/* <Text>Your expo push token: {expoPushToken}</Text>
-      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Title: {notification && notification.request.content.title} </Text>
-        <Text>Body: {notification && notification.request.content.body}</Text>
-        <Text>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>
-      </View> */}
     </View>
   );
 }

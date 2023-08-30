@@ -3,7 +3,7 @@ const Course = require('../models/course');
 const {ObjectId} = require('mongodb');
 const validation = require('../util/validation');
 const process = require('../app');
-const userConfig = require('../config/user-config');
+const config = require('../config/config');
 const {courseSearchingErrMsg} = require('../util/messages');
 
 
@@ -22,9 +22,13 @@ async function fetchCourse(req, res) {
 //알림 신청한 사용자를 과목에 추가하기
 async function addApplicantToCourse(req, res){
     const {name, code, grade, type} = req.body;
-    let modifiedName = name;
+    
+    //받은 데이터에 필요한 속성이 존재하는지 확인
+    if (validation.isUndefined(name, code, grade, type))
+      return res.json({error: true, message: '올바르지 않은 접근입니다.'});
 
     //과목 이름에서 괄호 시작 부분부터 없애기
+    let modifiedName = name;
     const indexOfParentheses = name.indexOf('(');
     if (indexOfParentheses !== -1)
         modifiedName = name.substring(0, indexOfParentheses);
@@ -55,8 +59,8 @@ async function addApplicantToCourse(req, res){
     //신청한 과목이 최대일 경우
     const user = new User(userId);
     await user.fetchUserData({_id: 0, applied_course_num: 1});
-    if (user.applied_course_num >= userConfig.max_applied_course_num)
-        return res.json({error: true, message: `신청 가능한 최대 과목 수는 ${userConfig.max_applied_course_num}개입니다.`});
+    if (user.applied_course_num >= config.max_applied_course_num)
+        return res.json({error: true, message: `신청 가능한 최대 과목 수는 ${config.max_applied_course_num}개입니다.`});
 
     
     //과목에 신청자 추가하기
@@ -72,9 +76,15 @@ async function addApplicantToCourse(req, res){
 
 //신청한 과목 삭제
 async function deleteApplicantFromCourse(req, res) {
+    const code = req.body.code;
+
+    //받은 데이터에 필요한 속성이 존재하는지 확인
+    if (validation.isUndefined(code))
+      return res.json({error: true, message: '올바르지 않은 접근입니다.'});
+
     const userId = res.locals.user.id;
     //과목으로부터 신청자 삭제
-    const course = new Course(req.body.code);
+    const course = new Course(code);
     await course.deleteApplicantFromOne(userId);
     //신청한 과목 수--
     const user = new User(userId);

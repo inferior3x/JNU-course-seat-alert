@@ -1,16 +1,13 @@
-function checkAuthenticationForForm(req, res, next){
+function checkAuthentication(req, res, next){
     if (!res.locals.isAuthenticated)
-        return res.redirect('/401');
-    return next();
-}
-function checkAuthenticationForFetch(req, res, next){
-    if (!res.locals.isAuthenticated)
-        return res.status(401).json();
+        if (req.headers['sec-fetch-mode'] === 'cors')
+            return res.status(401).json();
+        else
+            return res.redirect('/401');
     return next();
 }
 
 function checkAuthority(req, res, next){
-    //
 }
 
-module.exports = {checkAuthenticationForForm: checkAuthenticationForForm,checkAuthenticationForFetch: checkAuthenticationForFetch, checkAuthority: checkAuthority};
+module.exports = {checkAuthentication: checkAuthentication, checkAuthority: checkAuthority};

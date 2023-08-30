@@ -28,6 +28,10 @@ async function signup(req, res) {
     const enteredPassword = req.body['user-pw'];
     const enteredPassword2 = req.body['user-pw2'];
 
+    //받은 데이터에 필요한 속성이 존재하는지 확인
+    if (validation.isUndefined(enteredId, enteredPassword, enteredPassword2))
+      return res.json({error: true, message: '올바르지 않은 접근입니다.'});
+
     //입력값 유효성 검사
     const signupInfoVaildResult = validation.isSignupInfoValid(enteredId, enteredPassword, enteredPassword2);
     if (signupInfoVaildResult.error){
@@ -44,8 +48,6 @@ async function signup(req, res) {
     user.password = await bcrypt.hash(enteredPassword, 12);
     await user.create();
   
-    //자동 로그인?
-  
     res.json({error: false});
 }
 
@@ -55,6 +57,11 @@ async function login(req, res) {
     const enteredPassword = req.body['user-pw'];
     const pushToken = req.body['push-token'];
 
+    //받은 데이터에 필요한 속성이 존재하는지 확인
+    if (validation.isUndefined(enteredId, enteredPassword, pushToken))
+      return res.json({error: true, message: '올바르지 않은 접근입니다.'});
+
+    //유저 데이터 가져오기
     const user = new User(enteredId);
     await user.fetchUserData();
   
@@ -68,15 +75,15 @@ async function login(req, res) {
       return res.json({error: true, message: '아이디 혹은 비밀번호가 일치하지 않습니다.'});
     
     //토큰 없을 때 리턴
-    if (!pushToken.includes('Expo')) //pushToken = ExponentPushToken[...]
+    if (!pushToken.includes('Exponent')) //pushToken = ExponentPushToken[...]
       return res.json({error: true, message: '토큰 없음'});
 
     //위 조건을 모두 통과했을 때 로그인 수행
     
     //같은 계정 및 같은 디바이스의 세션들을 로그아웃
     const session = new Session(user.id, pushToken); 
-    await session.logoutSessionsById(); //아이디가 같은 세션은 다 삭제(자동 로그아웃 기능 + 여러 기기로 알림 보내기 방지)
-    await session.logoutSessionsByPushToken(); //푸시 토큰이 같은 세션 다 삭제(한 기기에서 패러렐즈 같은걸 사용하여 여러 계정으로 알림을 받는 것을 방지)
+    await session.logoutSessionsById(); //아이디가 같은 세션(자동 로그아웃 기능 + 여러 기기로 알림 보내기 방지)
+    await session.logoutSessionsByPushToken(); //푸시 토큰이 같은 세션(한 기기에서 패러렐즈 같은걸 사용하여 여러 계정으로 알림을 받는 것을 방지)
 
     //세션 쿠키 추가
     req.session['user'] = {

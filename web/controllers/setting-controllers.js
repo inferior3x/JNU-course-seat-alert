@@ -7,6 +7,10 @@ async function initAccount(req, res) {
     const userId = res.locals.user.id;
     const user = new User(userId);
 
+    //db에 계정 없는지
+    if (!await user.checkExistence())
+        return res.json({error: true, message: '계정이 존재하지 않습니다.'});
+
     //신청해둔 과목들 삭제
     await Course.deleteApplicantFromAll(userId);
 
@@ -21,6 +25,10 @@ async function deleteAccount(req, res) {
     const userId = res.locals.user.id;
     const session = new Session(userId);
     const user = new User(userId);
+
+    //db에 계정 없는지
+    if (!await user.checkExistence())
+        return res.json({error: true, message: '계정이 존재하지 않습니다.'});
 
     //신청한 과목들 삭제
     await Course.deleteApplicantFromAll(userId);
